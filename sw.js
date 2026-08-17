@@ -1,19 +1,19 @@
-// Damabang (담아방) Service Worker - v12.0.0 (Smart Auto-Fill & Preset Engine)
-const CACHE_NAME = 'damabang-v12.0.0';
+// Damabang (담아방) Service Worker - v20.0.0 (Direct Instagram Thumbnails & Feed AI Summaries)
+const CACHE_NAME = 'damabang-v20.0.0';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
-  './style.css?v=12',
-  './storage.js?v=12',
-  './mock-data.js?v=12',
-  './app.js?v=12',
-  './manifest.json?v=12',
-  './icons/icon.svg?v=12',
-  './icons/icon-192.png?v=12',
-  './icons/icon-512.png?v=12',
-  './icons/icon-512-maskable.png?v=12',
-  './icons/screenshot-narrow.png?v=12',
-  './icons/screenshot-wide.png?v=12'
+  './style.css?v=20',
+  './storage.js?v=20',
+  './mock-data.js?v=20',
+  './app.js?v=20',
+  './manifest.json?v=20',
+  './icons/icon.svg?v=20',
+  './icons/icon-192.png?v=20',
+  './icons/icon-512.png?v=20',
+  './icons/icon-512-maskable.png?v=20',
+  './icons/screenshot-narrow.png?v=20',
+  './icons/screenshot-wide.png?v=20'
 ];
 
 self.addEventListener('install', (event) => {
@@ -49,6 +49,12 @@ self.addEventListener('fetch', (event) => {
         return cachedIndex || fetch(event.request);
       })
     );
+    return;
+  }
+
+  // Bypass cache for external image CDNs (Instagram / YouTube / Unsplash)
+  if (url.origin !== location.origin) {
+    event.respondWith(fetch(event.request));
     return;
   }
 
