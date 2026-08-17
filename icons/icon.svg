@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="100%" height="100%">
+  <!-- Background Squircle (Kraken Purple #7132f5) -->
+  <rect width="512" height="512" rx="112" fill="#7132f5" />
+
+  <!-- 7. 단아한 보울 & 스파클 (Minimal Bowl & Sparkle) 단색 미니멀 심볼 -->
+  
+  <!-- 그릇 윗선 (Bowl Rim Line) -->
+  <line x1="110" y1="270" x2="402" y2="270" stroke="#ffffff" stroke-width="26" stroke-linecap="round" />
+
+  <!-- 그릇 몸통 곡선 (Bowl Body Curve) -->
+  <path d="M 128 270 C 128 385 200 415 256 415 C 312 415 384 385 384 270" 
+        fill="none" stroke="#ffffff" stroke-width="26" stroke-linecap="round" stroke-linejoin="round" />
+  
+  <!-- 그릇 안쪽 은은한 채움 (Subtle Bowl Inner Surface) -->
+  <path d="M 128 270 C 128 385 200 415 256 415 C 312 415 384 385 384 270 Z" 
+        fill="#ffffff" opacity="0.18" />
+
+  <!-- 그릇 굽 / 받침대 (Bowl Base Stand) -->
+  <line x1="216" y1="415" x2="296" y2="415" stroke="#ffffff" stroke-width="22" stroke-linecap="round" />
+
+  <!-- 그릇에 담긴 큰 영감의 별 (Primary 4-Point Sparkle) -->
+  <path d="M 256 95 C 256 142 272 175 316 175 C 272 175 256 208 256 255 C 256 208 240 175 196 175 C 240 175 256 142 256 95 Z" 
+        fill="#ffffff" />
+
+  <!-- 오른쪽 위 보조 별빛 (Secondary Sparkle) -->
+  <path d="M 350 115 C 350 132 357 142 372 142 C 357 142 350 152 350 169 C 350 152 343 142 328 142 C 343 142 350 132 350 115 Z" 
+        fill="#ffffff" />
+
+  <!-- 왼쪽 작은 빛방울 포인트 (Accent Dot) -->
+  <circle cx="160" cy="155" r="10" fill="#ffffff" />
+</svg>

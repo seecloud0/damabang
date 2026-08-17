@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="ko" style="background-color: #ffffff !important;">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <title>담아방 - 인스타·유튜브 콘텐츠 아카이브 & AI 스마트 플래너</title>
+
+  <!-- PWA & Mobile Meta Tags -->
+  <link rel="manifest" href="manifest.json?v=8" />
+  <meta name="theme-color" content="#7132f5" />
+  <meta name="background-color" content="#ffffff" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-title" content="담아방" />
+  <link rel="icon" type="image/svg+xml" href="icons/icon.svg?v=8" />
+  <link rel="apple-touch-icon" href="icons/icon.svg?v=8" />
+
+  <!-- Remix Icon & Kraken Fonts (IBM Plex Sans & Pretendard) -->
+  <link href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css" rel="stylesheet" />
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Pretendard:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="style.css?v=8" />
+
+  <style>
+    /* Absolute Pure White Guarantee */
+    html, body {
+      background-color: #ffffff !important;
+      color: #101114 !important;
+    }
+    #app-container {
+      background-color: #ffffff !important;
+    }
+    .main-view, .tab-pane {
+      background-color: #ffffff !important;
+    }
+  </style>
+
+  <script>
+    // Automatic Cache Cleaner
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.getRegistrations().then(function(registrations) {
+        for (let registration of registrations) {
+          registration.update();
+        }
+      });
+    }
+    if ('caches' in window) {
+      caches.keys().then(function(names) {
+        for (let name of names) {
+          if (name !== 'damabang-v8.0.0') {
+            caches.delete(name);
+          }
+        }
+      });
+    }
+  </script>
+</head>
+<body style="background-color: #ffffff !important;">
+
+  <!-- App Shell Container -->
+  <div id="app-container">
+    
+    <!-- Top Header -->
+    <header class="app-header">
+      <div class="header-top">
+        <div class="brand-wrapper">
+          <div class="brand-icon" style="padding: 2px;">
+            <img src="icons/icon.svg?v=7" alt="담아방 단아한 보울 로고" style="width: 100%; height: 100%; object-fit: contain;" />
+          </div>
+          <div>
+            <h1 class="brand-title">담아방</h1>
+          </div>
+        </div>
+        <div class="header-actions">
+          <button id="btn-toggle-select" class="header-btn" title="선택 모드">
+            <i class="ri-checkbox-multiple-line"></i>
+            <span>선택</span>
+          </button>
+          <button id="btn-quick-sample" class="header-btn" title="샘플 데이터 로드">
+            <i class="ri-sparkling-fill" style="color: #7132f5;"></i>
+            <span>예시</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Search Input -->
+      <div class="search-container">
+        <i class="ri-search-line search-icon"></i>
+        <input type="text" id="search-input" class="search-input" placeholder="키워드, 태그(#도쿄, #맛집), 장소 검색..." />
+        <button id="search-clear" class="search-clear"><i class="ri-close-circle-fill"></i></button>
+      </div>
+
+      <!-- Category Filter Carousel (좌우 스와이프 & 부드러운 스크롤) -->
+      <div class="category-carousel-wrapper">
+        <button id="chip-scroll-left" class="chip-nav-btn left hidden" title="이전 카테고리" aria-label="이전 카테고리">
+          <i class="ri-arrow-left-s-line"></i>
+        </button>
+        
+        <div class="category-scroll" id="category-chips">
+          <button class="cat-chip active" data-category="all">
+            <i class="ri-apps-2-line"></i> 전체보기
+          </button>
+          <button class="cat-chip" data-category="travel">
+            <i class="ri-flight-takeoff-line"></i> ✈️ 여행/명소
+          </button>
+          <button class="cat-chip" data-category="food">
+            <i class="ri-restaurant-2-line"></i> 🍱 맛집/카페
+          </button>
+          <button class="cat-chip" data-category="insight">
+            <i class="ri-lightbulb-line"></i> 💡 인사이트/공부
+          </button>
+          <button class="cat-chip" data-category="lifestyle">
+            <i class="ri-heart-pulse-line"></i> 🎨 라이프/기타
+          </button>
+        </div>
+
+        <button id="chip-scroll-right" class="chip-nav-btn right" title="다음 카테고리" aria-label="다음 카테고리">
+          <i class="ri-arrow-right-s-line"></i>
+        </button>
+      </div>
+    </header>
+
+    <!-- Selection Bar for Trip/Insight Generation -->
+    <div id="selection-bar" class="selection-bar">
+      <span class="selection-count"><span id="selected-count">0</span>개 선택됨</span>
+      <div class="selection-actions">
+        <button id="btn-plan-selected" class="btn-generate-plan">
+          <i class="ri-magic-line"></i> AI 일정/인사이트 생성
+        </button>
+      </div>
+    </div>
+
+    <!-- Main Views Container -->
+    <main class="main-view">
+      
+      <!-- Tab 1: Feed / Archive Grid -->
+      <section id="tab-feed" class="tab-pane active">
+        <div id="pins-grid" class="pins-grid">
+          <!-- Dynamically Rendered Pin Cards -->
+        </div>
+
+        <div id="feed-empty" class="empty-state" style="display: none;">
+          <div class="empty-icon"><i class="ri-sparkling-2-line"></i></div>
+          <h3 class="empty-title">담아둔 콘텐츠가 없습니다</h3>
+          <p class="empty-desc">인스타그램 릴스나 유튜브 링크를 복사하여 아래 [+] 버튼으로 내 담아방에 보관해보세요!</p>
+        </div>
+      </section>
+
+      <!-- Tab 2: Travel Spots & Routes -->
+      <section id="tab-spots" class="tab-pane">
+        <div id="spots-container">
+          <!-- Dynamically Grouped City Spots -->
+        </div>
+      </section>
+
+      <!-- Tab 3: AI Trip Planner & Insights -->
+      <section id="tab-planner" class="tab-pane">
+        <div class="planner-builder-card">
+          <div class="section-label">
+            <i class="ri-compass-3-line" style="color: var(--kraken-purple);"></i>
+            <span>담아방 AI 스마트 플래너</span>
+          </div>
+          <p style="font-size: 13px; color: var(--color-cool-gray); margin-bottom: 14px;">
+            담아둔 핀들의 장소와 꿀팁을 분석하여 최적의 일정표와 체크리스트를 자동 조합합니다.
+          </p>
+
+          <div class="planner-controls">
+            <div class="control-row">
+              <select id="planner-city-select" class="select-custom">
+                <option value="all">📍 모든 지역 대상</option>
+                <option value="도쿄 (Tokyo)">도쿄 (Tokyo)</option>
+                <option value="제주도 (Jeju)">제주도 (Jeju)</option>
+                <option value="생산성/라이프">💡 인사이트/자기계발 요약</option>
+              </select>
+              <select id="planner-duration-select" class="select-custom">
+                <option value="auto">⏱️ 맞춤 코스</option>
+                <option value="1">당일치기</option>
+                <option value="2">1박 2일</option>
+                <option value="3">2박 3일</option>
+                <option value="4">3박 4일</option>
+              </select>
+            </div>
+            <button id="btn-generate-ai-plan" class="btn-primary-action">
+              <i class="ri-sparkling-fill"></i> AI 여행 일정 & 인사이트 자동 생성
+            </button>
+          </div>
+        </div>
+
+        <div id="plan-output-container" class="plan-result-container">
+          <!-- Generated Day Plan Cards & Checklist will be rendered here -->
+        </div>
+      </section>
+
+      <!-- Tab 4: Settings & Local Storage Vault -->
+      <section id="tab-settings" class="tab-pane">
+        <div class="settings-section">
+          
+          <!-- Storage Statistics -->
+          <div class="stat-grid">
+            <div class="stat-box">
+              <span class="stat-label">담아둔 콘텐츠</span>
+              <span class="stat-value" id="stat-total-pins">0개</span>
+            </div>
+            <div class="stat-box">
+              <span class="stat-label">내 폰 로컬 용량</span>
+              <span class="stat-value" id="stat-storage-size">0 KB</span>
+            </div>
+          </div>
+
+          <!-- Privacy Banner -->
+          <div class="store-badge-card">
+            <div class="store-icon">🔒</div>
+            <div class="store-text">
+              <h4>100% 온디바이스 프라이빗 담아방</h4>
+              <p>모든 데이터는 외부 서버 없이 내 휴대폰 로컬에만 보관됩니다.</p>
+            </div>
+          </div>
+
+          <!-- Backup & Restore -->
+          <div class="settings-card">
+            <div class="settings-row">
+              <div class="setting-info">
+                <h4>로컬 백업 파일 내보내기</h4>
+                <p>스마트폰 다운로드 폴더에 JSON 백업 파일 저장</p>
+              </div>
+              <button id="btn-export-json" class="btn-setting">
+                <i class="ri-download-2-line"></i> 내보내기
+              </button>
+            </div>
+
+            <div class="settings-row">
+              <div class="setting-info">
+                <h4>백업 파일 불러오기 (복원)</h4>
+                <p>저장해둔 JSON 백업 파일 가져오기</p>
+              </div>
+              <label class="btn-setting" style="cursor: pointer;">
+                <i class="ri-upload-2-line"></i> 가져오기
+                <input type="file" id="input-import-json" accept=".json" style="display: none;" />
+              </label>
+            </div>
+          </div>
+
+          <!-- Play Store & PWA Install Guide -->
+          <div class="settings-card">
+            <div class="settings-row">
+              <div class="setting-info">
+                <h4>🚀 구글 플레이스토어 / 홈화면 추가</h4>
+                <p>휴대폰 홈화면에 앱으로 설치하거나 TWA/APK 패키징 안내</p>
+              </div>
+              <button id="btn-show-pwa-guide" class="btn-setting">
+                <i class="ri-android-line"></i> 설치 가이드
+              </button>
+            </div>
+
+            <div class="settings-row">
+              <div class="setting-info">
+                <h4>데이터 초기화</h4>
+                <p>기기에 담아둔 모든 핀 삭제</p>
+              </div>
+              <button id="btn-clear-data" class="btn-setting danger">
+                <i class="ri-delete-bin-line"></i> 전체 삭제
+              </button>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+    </main>
+
+    <!-- Floating Action Button (Add Clip) -->
+    <button id="fab-add" class="fab-add" title="새 콘텐츠 담기">
+      <i class="ri-add-line"></i>
+    </button>
+
+    <!-- Bottom Navigation Bar -->
+    <nav class="bottom-nav">
+      <button class="nav-item active" data-tab="feed">
+        <i class="ri-sparkling-2-line"></i>
+        <span>담아방</span>
+      </button>
+      <button class="nav-item" data-tab="spots">
+        <i class="ri-map-pin-range-line"></i>
+        <span>여행 스팟</span>
+      </button>
+      <button class="nav-item" data-tab="planner">
+        <i class="ri-magic-line"></i>
+        <span>AI 플래너</span>
+      </button>
+      <button class="nav-item" data-tab="settings">
+        <i class="ri-shield-user-line"></i>
+        <span>내 저장소</span>
+      </button>
+    </nav>
+
+  </div>
+
+  <!-- Modal 1: Add New Pin Bottom Sheet -->
+  <div id="modal-add" class="modal-overlay">
+    <div class="bottom-sheet">
+      <div class="sheet-handle"></div>
+      <div class="sheet-header">
+        <h3 class="sheet-title">✨ 담아방에 콘텐츠 보관하기</h3>
+        <button class="btn-close" id="btn-close-add"><i class="ri-close-line"></i></button>
+      </div>
+
+      <form id="form-add-pin">
+        <div class="form-group">
+          <label class="form-label">🔗 인스타 / 유튜브 링크</label>
+          <input type="url" id="add-url" class="form-input" placeholder="https://instagram.com/reel/... 또는 youtube.com/..." required />
+          <div id="url-preview-box" class="url-preview-box">
+            <img id="preview-thumb-img" src="" class="preview-thumb" alt="Preview" />
+            <div style="flex: 1; font-size: 13px; color: var(--color-near-black);">
+              <span id="preview-platform-text" style="font-weight: 700; color: var(--kraken-purple);">플랫폼 인식됨</span>
+              <div id="preview-auto-title" style="color: var(--color-cool-gray); font-size: 12px;">썸네일 및 정보 추출 완료</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">📌 제목 또는 콘텐츠 요약</label>
+          <input type="text" id="add-title" class="form-input" placeholder="예: 시부야 스카이 일몰 예약 꿀팁" required />
+        </div>
+
+        <div class="control-row">
+          <div class="form-group" style="flex: 1;">
+            <label class="form-label">🏷️ 카테고리</label>
+            <select id="add-category" class="form-select">
+              <option value="travel">✈️ 여행/명소</option>
+              <option value="food">🍱 맛집/카페</option>
+              <option value="insight">💡 인사이트/공부</option>
+              <option value="lifestyle">🎨 라이프/기타</option>
+            </select>
+          </div>
+          <div class="form-group" style="flex: 1;">
+            <label class="form-label">📍 여행지 / 도시</label>
+            <input type="text" id="add-city" class="form-input" placeholder="예: 도쿄, 제주도, 성수동" />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">🏢 상세 장소명 (지도 검색용)</label>
+          <input type="text" id="add-spot-name" class="form-input" placeholder="예: 시부야 스카이 루프탑" />
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">#️⃣ 태그 (쉼표로 구분)</label>
+          <input type="text" id="add-tags" class="form-input" placeholder="도쿄여행, 야경스팟, 3박4일" />
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">📝 핵심 메모 & 꿀팁 / 인사이트</label>
+          <textarea id="add-memo" class="form-textarea" placeholder="영상에서 언급된 예약 시간, 꼭 챙길 것, 인사이트 요약을 적어두세요."></textarea>
+        </div>
+
+        <button type="submit" class="btn-primary-action" style="margin-top: 10px;">
+          <i class="ri-save-3-line"></i> 내 담아방에 보관하기
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal 2: Pin Detail / Video Viewer Bottom Sheet -->
+  <div id="modal-detail" class="modal-overlay">
+    <div class="bottom-sheet">
+      <div class="sheet-handle"></div>
+      <div class="sheet-header">
+        <h3 class="sheet-title" id="detail-title">상세 정보</h3>
+        <button class="btn-close" id="btn-close-detail"><i class="ri-close-line"></i></button>
+      </div>
+
+      <div id="detail-video-container" class="player-container" style="display: none;">
+        <!-- Embedded Video Player -->
+      </div>
+
+      <div id="detail-image-container" style="margin-bottom: 14px; border-radius: var(--radius-btn); overflow: hidden;">
+        <img id="detail-image" src="" style="width: 100%; aspect-ratio: 16/9; object-fit: cover;" alt="Thumbnail" />
+      </div>
+
+      <div style="display: flex; gap: 8px; margin-bottom: 14px;" id="detail-badges">
+        <!-- Platform badge & category badge -->
+      </div>
+
+      <div class="settings-card" style="margin-bottom: 14px;">
+        <div style="font-size: 13px; font-weight: 700; color: var(--kraken-purple); display: flex; align-items: center; gap: 4px;">
+          <i class="ri-map-pin-2-fill"></i>
+          <span id="detail-location-text">위치 정보 없음</span>
+        </div>
+        <p id="detail-memo-text" style="font-size: 14px; line-height: 1.5; color: var(--color-near-black); margin-top: 6px;">
+          메모 내용
+        </p>
+      </div>
+
+      <div id="detail-insights-box" class="settings-card" style="margin-bottom: 14px; background: var(--kraken-purple-subtle); border-color: rgba(113, 50, 245, 0.2);">
+        <h4 style="font-size: 14px; font-weight: 700; color: var(--kraken-purple-deep); margin-bottom: 8px;">
+          💡 핵심 포인트 & 인사이트
+        </h4>
+        <ul id="detail-insights-list" style="padding-left: 18px; font-size: 13px; color: var(--color-near-black); line-height: 1.6;">
+          <!-- Insight points -->
+        </ul>
+      </div>
+
+      <div style="display: flex; gap: 8px;">
+        <a id="detail-external-link" href="#" target="_blank" class="btn-primary-action" style="flex: 2; text-decoration: none;">
+          <i class="ri-external-link-line"></i> 원본 콘텐츠 열기
+        </a>
+        <a id="detail-map-link" href="#" target="_blank" class="btn-setting" style="flex: 1; display: flex; align-items: center; justify-content: center; gap: 4px; text-decoration: none;">
+          <i class="ri-map-2-line"></i> 지도
+        </a>
+        <button id="detail-delete-btn" class="btn-setting danger" style="padding: 0 14px;">
+          <i class="ri-delete-bin-line"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal 3: Play Store & PWA Guide Modal -->
+  <div id="modal-pwa-guide" class="modal-overlay">
+    <div class="bottom-sheet">
+      <div class="sheet-handle"></div>
+      <div class="sheet-header">
+        <h3 class="sheet-title">📱 담아방 모바일 앱 설치 & 출시 가이드</h3>
+        <button class="btn-close" id="btn-close-pwa-guide"><i class="ri-close-line"></i></button>
+      </div>
+
+      <div class="settings-card" style="line-height: 1.6; font-size: 14px;">
+        <h4 style="color: var(--kraken-purple); margin-bottom: 6px;">1. 스마트폰 홈 화면에 바로 설치하기 (추천)</h4>
+        <p style="color: var(--color-cool-gray); margin-bottom: 10px;">
+          브라우저(Chrome/Safari) 메뉴에서 <strong>[홈 화면에 추가]</strong> 또는 <strong>[앱 설치]</strong>를 누르면 실제 스마트폰 앱처럼 설치되어 주소창 없이 전체 화면으로 사용할 수 있습니다.
+        </p>
+
+        <h4 style="color: var(--kraken-purple); margin-top: 14px; margin-bottom: 6px;">2. 구글 플레이스토어에 앱 등록하는 방법</h4>
+        <p style="color: var(--color-cool-gray);">
+          담아방은 표준 <code>manifest.json</code>과 <code>Service Worker</code>를 갖추고 있어 다음 2가지 방법으로 구글 플레이스토어용 <code>.aab</code> 또는 <code>.apk</code>를 1분 만에 만들 수 있습니다:
+        </p>
+        <ul style="padding-left: 20px; color: var(--color-cool-gray); margin-top: 8px;">
+          <li><strong>PWABuilder / Bubblewrap</strong>: 배포된 URL을 넣으면 구글 플레이용 TWA 안드로이드 패키지 자동 생성</li>
+          <li><strong>Capacitor (안드로이드 스튜디오)</strong>: <code>npx cap add android</code> 명령어로 즉시 네이티브 안드로이드 앱으로 빌드</li>
+        </ul>
+      </div>
+
+      <button class="btn-primary-action" id="btn-confirm-guide" style="margin-top: 16px;">
+        확인 완료
+      </button>
+    </div>
+  </div>
+
+  <!-- Toast Element -->
+  <div id="toast" class="toast">
+    <i class="ri-check-line" style="color: #10b981;"></i>
+    <span id="toast-msg">알림 메시지</span>
+  </div>
+
+  <!-- Application Logic -->
+  <script src="storage.js?v=8"></script>
+  <script src="mock-data.js?v=8"></script>
+  <script src="app.js?v=8"></script>
+</body>
+</html>

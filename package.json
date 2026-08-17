@@ -1,0 +1,18 @@
+{
+  "name": "damabang-app",
+  "version": "1.0.0",
+  "description": "담아방 - 인스타·유튜브 콘텐츠 아카이브 & AI 스마트 플래너",
+  "main": "index.html",
+  "scripts": {
+    "start": "serve . -l 5173",
+    "build": "echo 'Build complete'"
+  },
+  "keywords": ["travel", "archive", "insights", "damabang", "pwa"],
+  "author": "Damabang Team",
+  "license": "MIT",
+  "dependencies": {
+    "@capacitor/android": "^6.0.0",
+    "@capacitor/cli": "^6.0.0",
+    "@capacitor/core": "^6.0.0"
+  }
+}
