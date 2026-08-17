@@ -1,14 +1,16 @@
 {
-  "name": "담아방 - 인스타·유튜브 콘텐츠 아카이브 & 여행 플래너",
+  "name": "담아방 - 인스타·유튜브 콘텐츠 아카이브 & AI 스마트 플래너",
   "short_name": "담아방",
   "description": "인스타·유튜브 콘텐츠를 내 폰에만 안전하게 담아두고 똑똑한 여행 계획과 인사이트를 만들어주는 나만의 프라이빗 저장소",
   "start_url": "./index.html",
-  "id": "/damabang-app",
+  "scope": "./",
+  "id": "kr.damabang.app",
   "display": "standalone",
   "orientation": "portrait",
   "background_color": "#ffffff",
   "theme_color": "#7132f5",
   "lang": "ko",
+  "dir": "ltr",
   "categories": ["travel", "productivity", "lifestyle", "utilities"],
   "icons": [
     {
@@ -27,7 +29,7 @@
       "src": "icons/icon.svg",
       "sizes": "512x512",
       "type": "image/svg+xml",
-      "purpose": "any maskable"
+      "purpose": "maskable any"
     }
   ],
   "shortcuts": [
@@ -42,6 +44,22 @@
       "short_name": "플래너",
       "description": "담아둔 스팟으로 여행 일정 생성",
       "url": "./index.html?tab=planner"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "icons/icon.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "form_factor": "narrow",
+      "label": "담아방 메인 피드 & 아카이브"
+    },
+    {
+      "src": "icons/icon.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "form_factor": "wide",
+      "label": "담아방 AI 스마트 플래너"
     }
   ]
 }
