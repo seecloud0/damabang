@@ -1335,3 +1335,45 @@ html, body {
   from { opacity: 0; transform: translateY(-10px); }
   to { opacity: 1; transform: translateY(0); }
 }
+
+/* Quick Preset Chips in Add Modal */
+.quick-tags-prompt {
+  margin-top: 8px;
+  margin-bottom: 12px;
+  background: var(--kraken-purple-subtle);
+  border: 1px dashed rgba(113, 50, 245, 0.35);
+  border-radius: var(--radius-btn);
+  padding: 10px 12px;
+}
+
+.quick-chips-scroll {
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+  scrollbar-width: none;
+}
+
+.quick-chips-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+.quick-chip {
+  flex-shrink: 0;
+  background: #ffffff;
+  border: 1px solid rgba(113, 50, 245, 0.4);
+  color: var(--kraken-purple-deep);
+  font-size: 12px;
+  font-weight: 600;
+  padding: 6px 10px;
+  border-radius: var(--radius-btn);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.quick-chip:active {
+  background: var(--kraken-purple);
+  color: #ffffff;
+  transform: scale(0.96);
+}
+

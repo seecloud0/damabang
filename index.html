@@ -6,16 +6,16 @@
   <title>담아방 - 인스타·유튜브 콘텐츠 아카이브 & AI 스마트 플래너</title>
 
   <!-- PWA & Mobile Meta Tags -->
-  <link rel="manifest" href="manifest.json?v=11" />
+  <link rel="manifest" href="manifest.json?v=12" />
   <meta name="theme-color" content="#7132f5" />
   <meta name="background-color" content="#ffffff" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="default" />
   <meta name="apple-mobile-web-app-title" content="담아방" />
-  <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png?v=11" />
-  <link rel="icon" type="image/png" sizes="512x512" href="icons/icon-512.png?v=11" />
-  <link rel="icon" type="image/svg+xml" href="icons/icon.svg?v=11" />
-  <link rel="apple-touch-icon" href="icons/icon-192.png?v=11" />
+  <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png?v=12" />
+  <link rel="icon" type="image/png" sizes="512x512" href="icons/icon-512.png?v=12" />
+  <link rel="icon" type="image/svg+xml" href="icons/icon.svg?v=12" />
+  <link rel="apple-touch-icon" href="icons/icon-192.png?v=12" />
 
   <!-- Remix Icon & Kraken Fonts (IBM Plex Sans & Pretendard) -->
   <link href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css" rel="stylesheet" />
@@ -23,7 +23,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Pretendard:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
-  <link rel="stylesheet" href="style.css?v=11" />
+  <link rel="stylesheet" href="style.css?v=12" />
 
   <style>
     /* Absolute Pure White Guarantee */
@@ -51,7 +51,7 @@
     if ('caches' in window) {
       caches.keys().then(function(names) {
         for (let name of names) {
-          if (name !== 'damabang-v11.0.0') {
+          if (name !== 'damabang-v12.0.0') {
             caches.delete(name);
           }
         }
@@ -331,9 +331,25 @@
 
       <form id="form-add-pin">
         <div class="form-group">
-          <label class="form-label">🔗 인스타 / 유튜브 링크 또는 본문 붙여넣기</label>
-          <input type="text" id="add-url" class="form-input" placeholder="링크를 붙여넣으면 제목·카테고리·태그가 자동 입력됩니다" required />
+          <label class="form-label">🔗 인스타 / 유튜브 링크 또는 캡션(본문) 붙여넣기</label>
+          <input type="text" id="add-url" class="form-input" placeholder="링크 또는 본문 내용을 붙여넣으세요" required />
           
+          <!-- ⚡ 1초 자동완성 빠른 추천 칩 -->
+          <div class="quick-tags-prompt">
+            <div style="font-size: 12px; color: var(--kraken-purple-deep); margin-bottom: 6px; font-weight: 700;">
+              ⚡ 터치 한 번으로 제목·장소·태그 1초 자동완성:
+            </div>
+            <div class="quick-chips-scroll" id="quick-preset-chips">
+              <button type="button" class="quick-chip" data-preset="shibuya">🗼 도쿄 시부야 스카이</button>
+              <button type="button" class="quick-chip" data-preset="tsukiji">🍣 도쿄 츠키지 우니동 맛집</button>
+              <button type="button" class="quick-chip" data-preset="aewol">🏝️ 제주 애월 오션뷰 카페</button>
+              <button type="button" class="quick-chip" data-preset="seongsu">☕ 성수동 감성 베이커리</button>
+              <button type="button" class="quick-chip" data-preset="haeundae">🏖️ 부산 해운대 핫플</button>
+              <button type="button" class="quick-chip" data-preset="notion">💡 노션 생산성/시간관리</button>
+              <button type="button" class="quick-chip" data-preset="kyoto">🍵 교토 감성 산책 코스</button>
+            </div>
+          </div>
+
           <div id="url-preview-box" class="url-preview-box">
             <img id="preview-thumb-img" src="" class="preview-thumb" alt="Preview" />
             <div style="flex: 1; font-size: 13px; color: var(--color-near-black);">
@@ -344,7 +360,7 @@
         </div>
 
         <div class="form-group">
-          <label class="form-label">📌 제목 (자동 생성됨 / 수정 가능)</label>
+          <label class="form-label">📌 제목 또는 콘텐츠 요약 (자동 생성됨 / 수정 가능)</label>
           <input type="text" id="add-title" class="form-input" placeholder="예: 시부야 스카이 일몰 예약 꿀팁" required />
         </div>
 
@@ -478,8 +494,8 @@
   </div>
 
   <!-- Application Logic -->
-  <script src="storage.js?v=11"></script>
-  <script src="mock-data.js?v=11"></script>
-  <script src="app.js?v=11"></script>
+  <script src="storage.js?v=12"></script>
+  <script src="mock-data.js?v=12"></script>
+  <script src="app.js?v=12"></script>
 </body>
 </html>

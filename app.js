@@ -1,9 +1,9 @@
 // ==========================================================================
-// Damabang (담아방) Mobile Main Application Engine - v11.0.0
+// Damabang (담아방) Mobile Main Application Engine - v12.0.0
 // - Web Share Target Immediate Auto-Save (Instagram / YouTube 1-Click Share)
-// - Multi-lifecycle Listener (pageshow, visibilitychange, popstate)
-// - Smart Content & Tag Analyzer (Auto Category, Title, City, Spot, Tags & Notes)
-// - Clipboard 1-Tap Auto-Paste Engine
+// - Smart Content & Tag Analyzer with Deep Keyword & Preset Matching
+// - Real Media & Location-matched High Quality Visual Engine
+// - 1-Tap Quick Auto-fill Chips & Clipboard Auto-Paste
 // - 100% On-Device Local Storage (IndexedDB)
 // ==========================================================================
 
@@ -11,20 +11,99 @@
 // Smart Content & Metadata Analyzer Engine
 // ==========================================================================
 const SmartContentAnalyzer = {
+  PRESETS: {
+    'shibuya': {
+      title: '도쿄 시부야 스카이 노을 & 루프탑 일몰 예약 꿀팁',
+      category: 'travel',
+      city: '도쿄 (Tokyo)',
+      spotName: '시부야 스카이 (Shibuya Sky)',
+      tags: ['도쿄여행', '시부야스카이', '노을맛집', '야경명소', '3박4일'],
+      memo: '일몰 40분 전 시간대로 사전 예약 필수! 북서쪽 코너에서 후지산과 도쿄타워가 동시에 보이며, 루프탑 바람이 강하니 얇은 외투 지참하기.',
+      thumbnail: 'https://images.unsplash.com/photo-1542051841857-5f90071e7989?auto=format&fit=crop&w=800&q=80',
+      insightPoints: ['일몰 40분 전 사전 예약 필수', '북서쪽 코너 도쿄타워 뷰 명당', '사물함에 가방 보관 후 폰만 지참']
+    },
+    'tsukiji': {
+      title: '도쿄 츠키지 장외시장 줄서는 우니동 & 계란말이 골목 투어',
+      category: 'food',
+      city: '도쿄 (Tokyo)',
+      spotName: '츠키지 장외시장 (Tsukiji Outer Market)',
+      tags: ['도쿄맛집', '츠키지시장', '우니동', '계란말이', '미식투어'],
+      memo: '오전 8:30 방문 시 대기 시간 10분 이내! 야마초 100엔 계란말이와 우니 토라 성게알 덮밥 필수 코스, 현금 결제 준비.',
+      thumbnail: 'https://images.unsplash.com/photo-1579871494447-9811cf80d66c?auto=format&fit=crop&w=800&q=80',
+      insightPoints: ['오전 8:30 방문으로 대기 최소화', '우니토라 성게알 덮밥 강추', '현금 결제 점포 많음']
+    },
+    'aewol': {
+      title: '제주 애월 한담해변 노을 카페 & 오션뷰 드라이브 코스',
+      category: 'travel',
+      city: '제주도 (Jeju)',
+      spotName: '한담해변 & 애월 카페거리',
+      tags: ['제주여행', '애월카페', '노을명소', '한담산책로', '감성여행'],
+      memo: '일몰 1시간 전 한담산책로 주차 후 협재 쪽으로 드라이브. 비양도 너머로 지는 일몰 뷰와 딱새우회 포장 추천.',
+      thumbnail: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=800&q=80',
+      insightPoints: ['일몰 1시간 전 한담산책로 주차', '비양도 배경 노을 뷰 최고', '주변 딱새우회 포장 추천']
+    },
+    'seongsu': {
+      title: '성수동 신상 감성 베이커리 & 팝업스토어 데이트 코스',
+      category: 'food',
+      city: '서울 (Seoul)',
+      spotName: '성수동 카페거리 & 연무장길',
+      tags: ['서울핫플', '성수동카페', '베이커리', '디저트맛집', '주말나들이'],
+      memo: '주말 오후에는 웨이팅이 길어지므로 12시 이전 방문 추천! 소금빵 맛집과 팝업스토어 도보 5분 거리 동선 구성.',
+      thumbnail: 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=800&q=80',
+      insightPoints: ['오전 11:30 방문으로 웨이팅 단축', '연무장길 팝업스토어 순회', '소금빵 & 에스프레소 코스']
+    },
+    'haeundae': {
+      title: '부산 해운대 블루라인파크 해변열차 & 광안리 드론쇼 명당',
+      category: 'travel',
+      city: '부산 (Busan)',
+      spotName: '해운대 블루라인파크 & 미포정거장',
+      tags: ['부산여행', '해운대', '해변열차', '광안리', '야경투어'],
+      memo: '미포에서 송정까지 스카이캡슐 탑승 시 바다 쪽 좌석 사전 예약 필수! 저녁에는 광안리 해변에서 드론라이트쇼 관람.',
+      thumbnail: 'https://images.unsplash.com/photo-1538485399081-7191377e8241?auto=format&fit=crop&w=800&q=80',
+      insightPoints: ['스카이캡슐 2주 전 사전 예약', '미포 출발 편도 탑승 추천', '광안리 토요일 드론쇼 연계']
+    },
+    'notion': {
+      title: '일잘러의 노션 생산성 루틴 & 스마트 시간 관리 비법',
+      category: 'insight',
+      city: '생산성/라이프',
+      spotName: '자기계발 & 워크스페이스',
+      tags: ['생산성', '노션', '시간관리', '습관루틴', '자기계발'],
+      memo: '하루 10분 아침 저널링과 주간 리뷰 루틴 구축하기. 할 일 목록을 우선순위 3가지로 압축하여 집중력 극대화.',
+      thumbnail: 'https://images.unsplash.com/photo-1499750310107-5fef28a66643?auto=format&fit=crop&w=800&q=80',
+      insightPoints: ['아침 10분 데일리 플래닝', '우선순위 3가지 법칙 적용', '주말 30분 위클리 리뷰']
+    },
+    'kyoto': {
+      title: '교토 기요미즈데라(청수사) 아침 산책 & 아라시야마 대나무숲',
+      category: 'travel',
+      city: '교토 (Kyoto)',
+      spotName: '기요미즈데라 & 니넨자카',
+      tags: ['교토여행', '청수사', '아라시야마', '감성산책', '일본여행'],
+      memo: '오전 7시 개장 시간에 맞춰 청수사 방문 시 인파 없이 인생샷 촬영 가능. 이후 아라비카 응커피 테라스 추천.',
+      thumbnail: 'https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?auto=format&fit=crop&w=800&q=80',
+      insightPoints: ['오전 7시 얼리버드 방문 필수', '니넨자카-산넨자카 전통 골목', '아라시야마 대나무숲 힐링']
+    }
+  },
+
   CITIES: {
     '도쿄': { name: '도쿄 (Tokyo)', defaultImg: 'https://images.unsplash.com/photo-1503899036084-c55cdd92da26?auto=format&fit=crop&w=800&q=80' },
     '시부야': { city: '도쿄 (Tokyo)', name: '시부야 (Shibuya)', defaultImg: 'https://images.unsplash.com/photo-1542051841857-5f90071e7989?auto=format&fit=crop&w=800&q=80' },
     '신주쿠': { city: '도쿄 (Tokyo)', name: '신주쿠', defaultImg: 'https://images.unsplash.com/photo-1503899036084-c55cdd92da26?auto=format&fit=crop&w=800&q=80' },
+    '긴자': { city: '도쿄 (Tokyo)', name: '긴자', defaultImg: 'https://images.unsplash.com/photo-1503899036084-c55cdd92da26?auto=format&fit=crop&w=800&q=80' },
     '오사카': { name: '오사카 (Osaka)', defaultImg: 'https://images.unsplash.com/photo-1590559899731-a382839e5549?auto=format&fit=crop&w=800&q=80' },
     '교토': { name: '교토 (Kyoto)', defaultImg: 'https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?auto=format&fit=crop&w=800&q=80' },
     '후쿠오카': { name: '후쿠오카 (Fukuoka)', defaultImg: 'https://images.unsplash.com/photo-1570168007204-dfb528c6958f?auto=format&fit=crop&w=800&q=80' },
+    '유후인': { city: '후쿠오카 (Fukuoka)', name: '유후인 료칸', defaultImg: 'https://images.unsplash.com/photo-1570168007204-dfb528c6958f?auto=format&fit=crop&w=800&q=80' },
     '삿포로': { name: '삿포로 (Sapporo)', defaultImg: 'https://images.unsplash.com/photo-1548013146-72479768bada?auto=format&fit=crop&w=800&q=80' },
     '제주': { name: '제주도 (Jeju)', defaultImg: 'https://images.unsplash.com/photo-1579871494447-9811cf80d66c?auto=format&fit=crop&w=800&q=80' },
     '제주도': { name: '제주도 (Jeju)', defaultImg: 'https://images.unsplash.com/photo-1579871494447-9811cf80d66c?auto=format&fit=crop&w=800&q=80' },
+    '애월': { city: '제주도 (Jeju)', name: '애월 한담해변', defaultImg: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=800&q=80' },
     '서귀포': { city: '제주도 (Jeju)', name: '서귀포', defaultImg: 'https://images.unsplash.com/photo-1579871494447-9811cf80d66c?auto=format&fit=crop&w=800&q=80' },
     '성수': { city: '서울 (Seoul)', name: '성수동', defaultImg: 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=800&q=80' },
     '성수동': { city: '서울 (Seoul)', name: '성수동', defaultImg: 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=800&q=80' },
+    '홍대': { city: '서울 (Seoul)', name: '홍대/연남', defaultImg: 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=800&q=80' },
     '부산': { name: '부산 (Busan)', defaultImg: 'https://images.unsplash.com/photo-1538485399081-7191377e8241?auto=format&fit=crop&w=800&q=80' },
+    '해운대': { city: '부산 (Busan)', name: '해운대', defaultImg: 'https://images.unsplash.com/photo-1538485399081-7191377e8241?auto=format&fit=crop&w=800&q=80' },
+    '광안리': { city: '부산 (Busan)', name: '광안리', defaultImg: 'https://images.unsplash.com/photo-1538485399081-7191377e8241?auto=format&fit=crop&w=800&q=80' },
     '강릉': { name: '강릉 (Gangneung)', defaultImg: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=800&q=80' },
     '경주': { name: '경주 (Gyeongju)', defaultImg: 'https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?auto=format&fit=crop&w=800&q=80' },
     '파리': { name: '파리 (Paris)', defaultImg: 'https://images.unsplash.com/photo-1502602898657-3e91760cbb34?auto=format&fit=crop&w=800&q=80' },
@@ -38,19 +117,19 @@ const SmartContentAnalyzer = {
     '맛집', '카페', '라멘', '스시', '초밥', '우동', '디저트', '베이커리', '빵집', '식당', '고기', '삼겹살',
     '오마카세', '이자카야', '와인', '브런치', '커피', '밥집', '미식', '돈카츠', '돈까스', '야키토리', '텐동',
     '떡볶이', '국밥', '파스타', '피자', '버거', '수제버거', '흑돼지', '회', '해산물', '갈비', '솥밥', '안주',
-    '맥주', '하이볼', '야시장', '크루아상', '에스프레소', '말차', '젤라또'
+    '맥주', '하이볼', '야시장', '크루아상', '에스프레소', '말차', '젤라또', '소금빵', '베이글', '샌드위치'
   ],
 
   INSIGHT_KEYWORDS: [
     '생산성', '공부', '개발', '독서', '마인드셋', '자기계발', '습관', '루틴', '동기부여', '꿀팁', '노션',
     'ai', '챗지피티', 'chatgpt', '경제', '재테크', '주식', '투자', '코딩', '업무', '효율', '책추천', '부업',
-    '마케팅', '성공', '강의', '지식', '통찰', '인사이트', '커리어', '시간관리'
+    '마케팅', '성공', '강의', '지식', '통찰', '인사이트', '커리어', '시간관리', '정리'
   ],
 
   TRAVEL_KEYWORDS: [
     '여행', '투어', '핫플', '명소', '랜드마크', '전망대', '호텔', '료칸', '숙소', '에어비앤비', '리조트',
     '공항', '비행기', '항공권', '야경', '축제', '감성숙소', '해변', '바다', '산책', '테마파크', '디즈니',
-    '유니버셜', '온천', '일몰', '선셋', '포토스팟', '인생샷', '루프탑', '코스'
+    '유니버셜', '온천', '일몰', '선셋', '포토스팟', '인생샷', '루프탑', '코스', '드라이브'
   ],
 
   analyze(rawInput, inputTitle = '') {
@@ -89,7 +168,7 @@ const SmartContentAnalyzer = {
       }
     }
 
-    // 4. Identify City & Spot Name
+    // 4. Identify City & Spot Name from Text / Tags
     let detectedCity = '';
     let detectedSpot = '';
     let defaultImg = '';
@@ -99,6 +178,7 @@ const SmartContentAnalyzer = {
     for (const [key, info] of Object.entries(this.CITIES)) {
       if (searchCorpus.includes(key.toLowerCase())) {
         detectedCity = info.city || info.name;
+        detectedSpot = info.name || key;
         defaultImg = info.defaultImg;
         break;
       }
@@ -121,7 +201,7 @@ const SmartContentAnalyzer = {
       if (!defaultImg) defaultImg = 'https://images.unsplash.com/photo-1488646953014-85cb44e25828?auto=format&fit=crop&w=800&q=80';
     }
 
-    // 6. Clean Text for Title & Spot
+    // 6. Clean Text for Title
     let cleanText = text
       .replace(/(https?:\/\/[^\s]+)/gi, '')
       .replace(/#([a-zA-Z0-9ㄱ-ㅎㅏ-ㅣ가-힣_]+)/g, '')
@@ -130,21 +210,29 @@ const SmartContentAnalyzer = {
 
     let title = inputTitle.trim() || cleanText.slice(0, 50).trim();
     if (!title && tags.length > 0) {
-      title = `${tags.slice(0, 2).map(t => '#' + t).join(' ')} 추천 콘텐츠`;
+      title = `${tags.slice(0, 2).map(t => '#' + t).join(' ')} 핵심 꿀팁 & 명소`;
+    } else if (!title && detectedCity) {
+      title = `${detectedCity} ${detectedSpot || '핫플레이스'} 추천 코스`;
     } else if (!title) {
-      title = platform === 'instagram' ? '인스타그램 릴스 추천 콘텐츠' : platform === 'youtube' ? '유튜브 추천 영상' : '담아둔 콘텐츠';
+      title = platform === 'instagram' ? '인스타그램 릴스 저장 콘텐츠' : platform === 'youtube' ? '유튜브 추천 영상' : '담아둔 콘텐츠';
     }
 
-    // Spot name heuristic
-    if (detectedCity && !detectedSpot) {
-      const parts = title.split(/[·|\-\/\s]/).filter(p => p.length >= 2 && !p.includes(detectedCity));
-      if (parts.length > 0) {
-        detectedSpot = parts[0];
+    // Final tags consolidation
+    let finalTags = tags;
+    if (finalTags.length === 0) {
+      if (detectedCity) {
+        finalTags = [detectedCity.split(' ')[0], detectedSpot.split(' ')[0], category === 'food' ? '맛집투어' : category === 'travel' ? '여행' : '인사이트'].filter(Boolean);
+      } else {
+        finalTags = [category === 'food' ? '맛집' : category === 'travel' ? '여행지' : category === 'insight' ? '자기계발' : '라이프'];
       }
     }
 
-    const memo = cleanText.length > 10 ? cleanText : `${title}\n(인스타그램/유튜브에서 담아방으로 보관됨)`;
-    const finalThumbnail = realThumbnail || defaultImg || 'https://images.unsplash.com/photo-1488646953014-85cb44e25828?auto=format&fit=crop&w=800&q=80';
+    // Memo structured formatting
+    const memo = cleanText.length > 15 
+      ? cleanText 
+      : `${title}\n\n📌 추천 포인트: ${detectedCity ? detectedCity + ' ' + detectedSpot : '소장 가치 높은 콘텐츠'}\n💡 꿀팁: 사전 예약 및 시간대 확인 후 방문 추천!`;
+
+    const finalThumbnail = realThumbnail || defaultImg || 'https://images.unsplash.com/photo-1542051841857-5f90071e7989?auto=format&fit=crop&w=800&q=80';
 
     return {
       url: url || text,
@@ -153,14 +241,15 @@ const SmartContentAnalyzer = {
       category,
       city: detectedCity,
       spotName: detectedSpot,
-      tags: tags.length > 0 ? tags : (detectedCity ? [detectedCity.split(' ')[0], category] : [category]),
+      tags: finalTags,
       memo,
       thumbnail: finalThumbnail,
       realThumbnail,
       embedUrl,
       insightPoints: [
-        `${title} 핵심 꿀팁 요약`,
-        detectedCity ? `📍 위치: ${detectedCity} ${detectedSpot}` : '💡 유용한 인사이트 보관됨'
+        `${title} 핵심 포인트 요약`,
+        detectedCity ? `📍 추천 위치: ${detectedCity} ${detectedSpot}` : '💡 유용한 인사이트 보관됨',
+        '⏰ 추천 시간대 확인 후 방문 권장'
       ]
     };
   }
@@ -175,7 +264,6 @@ class DamabangApp {
     this.selectedPinIds = new Set();
     this.isSelectionMode = false;
     this.activePin = null;
-    this.hasHandledShare = false;
 
     this.init();
   }
@@ -220,13 +308,11 @@ class DamabangApp {
     const action = params.get('action');
 
     if (sharedUrl || sharedText || sharedTitle) {
-      this.hasHandledShare = true;
       const combinedInput = [sharedUrl, sharedText].filter(Boolean).join(' ');
       console.log('🔥 Incoming Web Share Target detected:', { sharedUrl, sharedText, sharedTitle, combinedInput });
 
       const analysis = SmartContentAnalyzer.analyze(combinedInput, sharedTitle || '');
 
-      // Create new Pin object
       const newPin = {
         id: 'pin_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5),
         url: analysis.url,
@@ -245,21 +331,17 @@ class DamabangApp {
         createdAt: new Date().toISOString()
       };
 
-      // 1. Immediately Save to Local Storage
       await window.storageManager.savePin(newPin);
       this.pins = await window.storageManager.getAllPins();
 
-      // 2. Switch to feed & re-render
       this.switchTab('feed');
       this.render();
 
-      // 3. Show celebratory toast and open detail view
       this.showToast(`🎉 '${analysis.title}' 담아방에 자동 보관 완료!`);
       setTimeout(() => {
         this.openDetailModal(newPin);
       }, 350);
 
-      // 4. Clean up URL parameters without reload
       window.history.replaceState({}, document.title, window.location.pathname);
     } else if (action === 'add') {
       this.openAddModal();
@@ -272,12 +354,10 @@ class DamabangApp {
     if (!navigator.clipboard || !navigator.clipboard.readText) return;
 
     try {
-      // Gentle clipboard check on window focus
       const checkClip = async () => {
         try {
           const text = await navigator.clipboard.readText();
           if (text && (text.includes('instagram.com') || text.includes('youtube.com') || text.includes('youtu.be'))) {
-            // Check if already in pins
             const alreadyExists = this.pins.some(p => p.url && text.includes(p.url));
             if (!alreadyExists) {
               const banner = document.getElementById('clipboard-banner');
@@ -290,7 +370,7 @@ class DamabangApp {
             }
           }
         } catch (e) {
-          // Clipboard permission dismissed or unavailable
+          // ignore
         }
       };
 
@@ -301,7 +381,6 @@ class DamabangApp {
     }
   }
 
-  // Register Service Worker for PWA & Offline Support
   registerServiceWorker() {
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
@@ -312,9 +391,7 @@ class DamabangApp {
     }
   }
 
-  // Bind UI Events
   bindEvents() {
-    // Multi-lifecycle Share Target Listeners (Android WebAPK background wakeup)
     window.addEventListener('pageshow', () => this.handleIncomingShareTarget());
     document.addEventListener('visibilitychange', () => {
       if (document.visibilityState === 'visible') {
@@ -398,6 +475,30 @@ class DamabangApp {
       setTimeout(updateScrollButtons, 200);
     }
 
+    // Quick Preset Chips in Add Modal
+    document.querySelectorAll('#quick-preset-chips .quick-chip').forEach(chip => {
+      chip.addEventListener('click', () => {
+        const presetKey = chip.getAttribute('data-preset');
+        const preset = SmartContentAnalyzer.PRESETS[presetKey];
+        if (preset) {
+          document.getElementById('add-title').value = preset.title;
+          document.getElementById('add-category').value = preset.category;
+          document.getElementById('add-city').value = preset.city;
+          document.getElementById('add-spot-name').value = preset.spotName;
+          document.getElementById('add-tags').value = preset.tags.join(', ');
+          document.getElementById('add-memo').value = preset.memo;
+
+          this.currentAutoAnalysis = {
+            ...preset,
+            url: document.getElementById('add-url').value || `https://instagram.com/p/${presetKey}_sample`,
+            platform: 'instagram'
+          };
+          this.updatePreviewBox(this.currentAutoAnalysis);
+          this.showToast(`✨ '${preset.spotName}' 꿀팁 정보가 자동 채워졌습니다!`);
+        }
+      });
+    });
+
     // Search Input
     const searchInput = document.getElementById('search-input');
     const searchClear = document.getElementById('search-clear');
@@ -424,17 +525,17 @@ class DamabangApp {
           try {
             textToPaste = await navigator.clipboard.readText();
           } catch (e) {
-            // fallback to prompt
+            // fallback
           }
         }
         if (!textToPaste) {
-          textToPaste = prompt('인스타그램 또는 유튜브 링크를 붙여넣으세요:');
+          textToPaste = prompt('인스타그램 또는 유튜브 링크 / 본문 내용을 붙여넣으세요:');
         }
 
         if (textToPaste && textToPaste.trim()) {
           const analysis = SmartContentAnalyzer.analyze(textToPaste.trim());
           this.openAddModal(analysis);
-          this.showToast('✨ 링크를 분석하여 자동으로 채웠습니다!');
+          this.showToast('✨ 링크와 내용을 분석하여 자동으로 채웠습니다!');
         }
       });
     }
@@ -524,6 +625,24 @@ class DamabangApp {
       this.handleUrlInputLive(e.target.value.trim());
     });
 
+    // Live Title Input listener to update category/tags/spot
+    const addTitleInput = document.getElementById('add-title');
+    addTitleInput.addEventListener('input', (e) => {
+      const titleVal = e.target.value.trim();
+      if (titleVal.length >= 2) {
+        const partialAnalysis = SmartContentAnalyzer.analyze(titleVal, titleVal);
+        if (partialAnalysis.city && !document.getElementById('add-city').value) {
+          document.getElementById('add-city').value = partialAnalysis.city;
+        }
+        if (partialAnalysis.spotName && !document.getElementById('add-spot-name').value) {
+          document.getElementById('add-spot-name').value = partialAnalysis.spotName;
+        }
+        if (partialAnalysis.category) {
+          document.getElementById('add-category').value = partialAnalysis.category;
+        }
+      }
+    });
+
     // Planner Tab Generate Button
     document.getElementById('btn-generate-ai-plan').addEventListener('click', () => {
       this.generateAIPlanFromFilters();
@@ -590,7 +709,6 @@ class DamabangApp {
     });
   }
 
-  // Switch Active Tab View
   switchTab(tabId) {
     this.currentTab = tabId;
 
@@ -619,7 +737,6 @@ class DamabangApp {
     }
   }
 
-  // Toggle Selection Mode
   toggleSelectionMode() {
     this.isSelectionMode = !this.isSelectionMode;
     const btn = document.getElementById('btn-toggle-select');
@@ -644,7 +761,6 @@ class DamabangApp {
     document.getElementById('selected-count').innerText = this.selectedPinIds.size;
   }
 
-  // Filter Pins based on category & search
   getFilteredPins() {
     return this.pins.filter(pin => {
       if (this.currentCategory !== 'all' && pin.category !== this.currentCategory) {
@@ -672,7 +788,6 @@ class DamabangApp {
     this.renderSettings();
   }
 
-  // Render Feed Tab with Accurate Real Thumbnails
   renderFeed() {
     const grid = document.getElementById('pins-grid');
     const emptyState = document.getElementById('feed-empty');
@@ -692,7 +807,7 @@ class DamabangApp {
       const platformIcon = isInstagram ? 'ri-instagram-fill' : 'ri-youtube-fill';
       const platformName = isInstagram ? 'Reels' : 'YouTube';
 
-      const thumbUrl = pin.thumbnail || 'https://images.unsplash.com/photo-1488646953014-85cb44e25828?auto=format&fit=crop&w=800&q=80';
+      const thumbUrl = pin.thumbnail || 'https://images.unsplash.com/photo-1542051841857-5f90071e7989?auto=format&fit=crop&w=800&q=80';
       const cityName = pin.location && pin.location.city ? pin.location.city : '';
       const spotName = pin.location && pin.location.name ? pin.location.name : '';
       const locationText = [cityName, spotName].filter(Boolean).join(' · ');
@@ -702,7 +817,7 @@ class DamabangApp {
       return `
         <article class="pin-card ${isSelected ? 'selected' : ''}" data-id="${pin.id}">
           <div class="card-media-wrapper">
-            <img class="card-img" src="${thumbUrl}" alt="${pin.title}" loading="lazy" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1488646953014-85cb44e25828?auto=format&fit=crop&w=800&q=80';" />
+            <img class="card-img" src="${thumbUrl}" alt="${pin.title}" loading="lazy" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1542051841857-5f90071e7989?auto=format&fit=crop&w=800&q=80';" />
             <div class="card-badges">
               <span class="platform-badge ${platformClass}">
                 <i class="${platformIcon}"></i> ${platformName}
@@ -726,7 +841,6 @@ class DamabangApp {
       `;
     }).join('');
 
-    // Attach click listeners
     grid.querySelectorAll('.pin-card').forEach(card => {
       card.addEventListener('click', () => {
         const pinId = card.getAttribute('data-id');
@@ -749,7 +863,6 @@ class DamabangApp {
     });
   }
 
-  // Render Spots Tab
   renderSpots() {
     const container = document.getElementById('spots-container');
     const travelPins = this.pins.filter(p => p.location && (p.location.city || p.location.name));
@@ -811,7 +924,6 @@ class DamabangApp {
     }).join('');
   }
 
-  // Render Planner Initial
   renderPlannerInitial() {
     const outputContainer = document.getElementById('plan-output-container');
     if (!outputContainer.innerHTML.trim()) {
@@ -933,14 +1045,12 @@ class DamabangApp {
     });
   }
 
-  // Render Settings Tab
   async renderSettings() {
     const stats = await window.storageManager.getStats();
     document.getElementById('stat-total-pins').innerText = `${stats.count}개`;
     document.getElementById('stat-storage-size').innerText = stats.formattedSize;
   }
 
-  // Modal Handling
   openModal(modalId) {
     const modal = document.getElementById(modalId);
     if (modal) modal.classList.add('active');
@@ -951,7 +1061,6 @@ class DamabangApp {
     if (modal) modal.classList.remove('active');
   }
 
-  // Open Add Pin Modal with Optional Pre-analyzed Data
   openAddModal(prefillData = null) {
     const form = document.getElementById('form-add-pin');
     form.reset();
@@ -975,7 +1084,6 @@ class DamabangApp {
     this.openModal('modal-add');
   }
 
-  // Live Auto-Analysis on Paste / Input
   handleUrlInputLive(inputText) {
     if (!inputText) {
       document.getElementById('url-preview-box').classList.remove('active');
@@ -987,14 +1095,12 @@ class DamabangApp {
     const analysis = SmartContentAnalyzer.analyze(inputText, currentTitle);
     this.currentAutoAnalysis = analysis;
 
-    if (!document.getElementById('add-title').value || document.getElementById('add-title').value.includes('인스타그램') || document.getElementById('add-title').value.includes('유튜브')) {
-      document.getElementById('add-title').value = analysis.title;
-    }
+    document.getElementById('add-title').value = analysis.title;
     document.getElementById('add-category').value = analysis.category;
     if (analysis.city) document.getElementById('add-city').value = analysis.city;
     if (analysis.spotName) document.getElementById('add-spot-name').value = analysis.spotName;
     if (analysis.tags.length > 0) document.getElementById('add-tags').value = analysis.tags.join(', ');
-    if (!document.getElementById('add-memo').value) document.getElementById('add-memo').value = analysis.memo;
+    if (analysis.memo) document.getElementById('add-memo').value = analysis.memo;
 
     this.updatePreviewBox(analysis);
   }
@@ -1008,16 +1114,15 @@ class DamabangApp {
     previewBox.classList.add('active');
     previewThumb.src = analysis.thumbnail;
     previewThumb.onerror = () => {
-      previewThumb.src = 'https://images.unsplash.com/photo-1488646953014-85cb44e25828?auto=format&fit=crop&w=400&q=80';
+      previewThumb.src = 'https://images.unsplash.com/photo-1542051841857-5f90071e7989?auto=format&fit=crop&w=400&q=80';
     };
 
     const isInsta = analysis.platform === 'instagram';
     const isYt = analysis.platform === 'youtube';
-    previewPlatform.innerHTML = isInsta ? '📷 Instagram 릴스/게시물 분석 완료' : isYt ? '▶️ YouTube 영상 썸네일 추출 완료' : '🔗 웹 링크 분석 완료';
-    previewTitle.innerText = `${analysis.category === 'travel' ? '✈️ 여행' : analysis.category === 'food' ? '🍱 맛집' : analysis.category === 'insight' ? '💡 인사이트' : '🎨 라이프'} · ${analysis.city || '일반'}`;
+    previewPlatform.innerHTML = isInsta ? '📷 Instagram 릴스/게시물 분석 완료' : isYt ? '▶️ YouTube 영상 썸네일 추출 완료' : '🔗 스마트 분석 완료';
+    previewTitle.innerText = `${analysis.category === 'travel' ? '✈️ 여행' : analysis.category === 'food' ? '🍱 맛집' : analysis.category === 'insight' ? '💡 인사이트' : '🎨 라이프'} · ${analysis.city || '명소'}`;
   }
 
-  // Open Detail Modal
   openDetailModal(pin) {
     this.activePin = pin;
     document.getElementById('detail-title').innerText = pin.title;
@@ -1037,9 +1142,9 @@ class DamabangApp {
       videoContainer.style.display = 'none';
       videoContainer.innerHTML = '';
       imageContainer.style.display = 'block';
-      detailImage.src = pin.thumbnail || 'https://images.unsplash.com/photo-1488646953014-85cb44e25828?auto=format&fit=crop&w=800&q=80';
+      detailImage.src = pin.thumbnail || 'https://images.unsplash.com/photo-1542051841857-5f90071e7989?auto=format&fit=crop&w=800&q=80';
       detailImage.onerror = () => {
-        detailImage.src = 'https://images.unsplash.com/photo-1488646953014-85cb44e25828?auto=format&fit=crop&w=800&q=80';
+        detailImage.src = 'https://images.unsplash.com/photo-1542051841857-5f90071e7989?auto=format&fit=crop&w=800&q=80';
       };
     }
 
@@ -1077,7 +1182,6 @@ class DamabangApp {
     this.openModal('modal-detail');
   }
 
-  // Submit Add Pin Form
   async handleAddPinSubmit() {
     const url = document.getElementById('add-url').value.trim();
     const title = document.getElementById('add-title').value.trim();
@@ -1087,28 +1191,28 @@ class DamabangApp {
     const tagsRaw = document.getElementById('add-tags').value.trim();
     const memo = document.getElementById('add-memo').value.trim();
 
-    if (!url || !title) {
-      alert('URL과 제목을 입력해주세요.');
+    if (!url && !title) {
+      alert('URL 또는 제목을 입력해주세요.');
       return;
     }
 
-    const analysis = this.currentAutoAnalysis || SmartContentAnalyzer.analyze(url, title);
+    const analysis = this.currentAutoAnalysis || SmartContentAnalyzer.analyze(url || title, title);
     const tags = tagsRaw ? tagsRaw.split(',').map(t => t.replace('#', '').trim()).filter(Boolean) : analysis.tags;
 
     const newPin = {
       id: 'pin_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5),
-      url: url,
-      title: title,
+      url: url || analysis.url || '#',
+      title: title || analysis.title,
       platform: analysis.platform || (url.includes('instagram.com') ? 'instagram' : url.includes('youtube.com') || url.includes('youtu.be') ? 'youtube' : 'generic'),
-      category: category,
-      tags: tags,
+      category: category || analysis.category || 'travel',
+      tags: tags.length > 0 ? tags : analysis.tags,
       location: {
         city: city || analysis.city || '',
         name: spotName || analysis.spotName || '',
         address: ''
       },
       memo: memo || analysis.memo || '',
-      thumbnail: analysis.thumbnail,
+      thumbnail: analysis.thumbnail || 'https://images.unsplash.com/photo-1542051841857-5f90071e7989?auto=format&fit=crop&w=800&q=80',
       insightPoints: analysis.insightPoints || [
         `${title} 핵심 꿀팁 요약`,
         city ? `📍 추천 위치: ${city} ${spotName}` : '💡 유용한 인사이트 보관됨'
@@ -1120,7 +1224,7 @@ class DamabangApp {
     this.pins = await window.storageManager.getAllPins();
     this.closeModal('modal-add');
     this.render();
-    this.showToast(`✨ '${title}' 담아방에 보관 완료!`);
+    this.showToast(`✨ '${newPin.title}' 담아방에 보관 완료!`);
   }
 
   extractYouTubeId(url) {
@@ -1140,7 +1244,6 @@ class DamabangApp {
   }
 }
 
-// Global App Instance Initialization
 window.addEventListener('DOMContentLoaded', () => {
   window.damabangApp = new DamabangApp();
 });
