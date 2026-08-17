@@ -1307,3 +1307,31 @@ html, body {
   transform: translateX(-50%) translateY(0);
   opacity: 1;
 }
+
+/* Floating Clipboard Auto-Detection Banner */
+.clipboard-banner {
+  background: #ffffff;
+  border: 1.5px solid var(--kraken-purple);
+  border-radius: var(--radius-btn);
+  padding: 10px 14px;
+  margin: 10px 16px 4px 16px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  box-shadow: 0 4px 18px rgba(113, 50, 245, 0.15);
+  animation: slideDown 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  z-index: 35;
+}
+
+.clipboard-content {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+  overflow: hidden;
+}
+
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}

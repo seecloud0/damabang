@@ -6,16 +6,16 @@
   <title>담아방 - 인스타·유튜브 콘텐츠 아카이브 & AI 스마트 플래너</title>
 
   <!-- PWA & Mobile Meta Tags -->
-  <link rel="manifest" href="manifest.json?v=10" />
+  <link rel="manifest" href="manifest.json?v=11" />
   <meta name="theme-color" content="#7132f5" />
   <meta name="background-color" content="#ffffff" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="default" />
   <meta name="apple-mobile-web-app-title" content="담아방" />
-  <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png?v=10" />
-  <link rel="icon" type="image/png" sizes="512x512" href="icons/icon-512.png?v=10" />
-  <link rel="icon" type="image/svg+xml" href="icons/icon.svg?v=10" />
-  <link rel="apple-touch-icon" href="icons/icon-192.png?v=10" />
+  <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png?v=11" />
+  <link rel="icon" type="image/png" sizes="512x512" href="icons/icon-512.png?v=11" />
+  <link rel="icon" type="image/svg+xml" href="icons/icon.svg?v=11" />
+  <link rel="apple-touch-icon" href="icons/icon-192.png?v=11" />
 
   <!-- Remix Icon & Kraken Fonts (IBM Plex Sans & Pretendard) -->
   <link href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css" rel="stylesheet" />
@@ -23,7 +23,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Pretendard:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
-  <link rel="stylesheet" href="style.css?v=10" />
+  <link rel="stylesheet" href="style.css?v=11" />
 
   <style>
     /* Absolute Pure White Guarantee */
@@ -51,7 +51,7 @@
     if ('caches' in window) {
       caches.keys().then(function(names) {
         for (let name of names) {
-          if (name !== 'damabang-v10.0.0') {
+          if (name !== 'damabang-v11.0.0') {
             caches.delete(name);
           }
         }
@@ -69,13 +69,17 @@
       <div class="header-top">
         <div class="brand-wrapper">
           <div class="brand-icon" style="padding: 2px;">
-            <img src="icons/icon.svg?v=10" alt="담아방 단아한 보울 로고" style="width: 100%; height: 100%; object-fit: contain;" />
+            <img src="icons/icon.svg?v=11" alt="담아방 단아한 보울 로고" style="width: 100%; height: 100%; object-fit: contain;" />
           </div>
           <div>
             <h1 class="brand-title">담아방</h1>
           </div>
         </div>
         <div class="header-actions">
+          <button id="btn-quick-paste" class="header-btn" title="복사한 링크 즉시 담기">
+            <i class="ri-clipboard-line" style="color: #7132f5;"></i>
+            <span>붙여넣기</span>
+          </button>
           <button id="btn-toggle-select" class="header-btn" title="선택 모드">
             <i class="ri-checkbox-multiple-line"></i>
             <span>선택</span>
@@ -124,6 +128,23 @@
       </div>
     </header>
 
+    <!-- Floating Clipboard Auto-Detection Banner -->
+    <div id="clipboard-banner" class="clipboard-banner" style="display: none;">
+      <div class="clipboard-content">
+        <i class="ri-instagram-fill" style="color: #e1306c; font-size: 22px;"></i>
+        <div style="flex: 1; overflow: hidden;">
+          <div style="font-weight: 700; font-size: 13px; color: var(--color-near-black);">복사한 인스타 릴스 발견!</div>
+          <div id="clipboard-url-text" style="font-size: 12px; color: var(--color-cool-gray); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">https://...</div>
+        </div>
+      </div>
+      <button id="btn-clipboard-add" class="btn-primary-action" style="height: 36px; padding: 0 14px; font-size: 13px; width: auto; white-space: nowrap;">
+        즉시 담기
+      </button>
+      <button id="btn-clipboard-close" style="background: transparent; border: none; font-size: 18px; color: var(--color-cool-gray); cursor: pointer; padding: 4px;">
+        <i class="ri-close-line"></i>
+      </button>
+    </div>
+
     <!-- Selection Bar for Trip/Insight Generation -->
     <div id="selection-bar" class="selection-bar">
       <span class="selection-count"><span id="selected-count">0</span>개 선택됨</span>
@@ -146,7 +167,7 @@
         <div id="feed-empty" class="empty-state" style="display: none;">
           <div class="empty-icon"><i class="ri-sparkling-2-line"></i></div>
           <h3 class="empty-title">담아둔 콘텐츠가 없습니다</h3>
-          <p class="empty-desc">인스타그램이나 유튜브에서 [공유하기 ➡️ 담아방]을 누르거나 아래 [+] 버튼으로 콘텐츠를 보관해보세요!</p>
+          <p class="empty-desc">인스타그램이나 유튜브에서 [공유하기 ➡️ 담아방]을 누르거나 상단 [붙여넣기]로 콘텐츠를 보관해보세요!</p>
         </div>
       </section>
 
@@ -457,8 +478,8 @@
   </div>
 
   <!-- Application Logic -->
-  <script src="storage.js?v=10"></script>
-  <script src="mock-data.js?v=10"></script>
-  <script src="app.js?v=10"></script>
+  <script src="storage.js?v=11"></script>
+  <script src="mock-data.js?v=11"></script>
+  <script src="app.js?v=11"></script>
 </body>
 </html>

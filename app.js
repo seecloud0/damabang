@@ -1,8 +1,9 @@
 // ==========================================================================
-// Damabang (담아방) Mobile Main Application Engine
-// - Web Share Target Support (Instagram / YouTube 1-Click Share)
-// - Smart Content Analyzer (Auto Category, Title, City, Spot, Tags & Notes)
-// - Real Media Thumbnail Engine
+// Damabang (담아방) Mobile Main Application Engine - v11.0.0
+// - Web Share Target Immediate Auto-Save (Instagram / YouTube 1-Click Share)
+// - Multi-lifecycle Listener (pageshow, visibilitychange, popstate)
+// - Smart Content & Tag Analyzer (Auto Category, Title, City, Spot, Tags & Notes)
+// - Clipboard 1-Tap Auto-Paste Engine
 // - 100% On-Device Local Storage (IndexedDB)
 // ==========================================================================
 
@@ -83,7 +84,6 @@ const SmartContentAnalyzer = {
       const instaMatch = url.match(/instagram\.com\/(?:p|reel|tv)\/([a-zA-Z0-9_-]+)/i);
       instaCode = instaMatch ? instaMatch[1] : null;
       if (instaCode) {
-        // Direct media preview proxy URL
         realThumbnail = `https://www.instagram.com/p/${instaCode}/media/?size=l`;
         embedUrl = `https://www.instagram.com/p/${instaCode}/embed/`;
       }
@@ -175,6 +175,7 @@ class DamabangApp {
     this.selectedPinIds = new Set();
     this.isSelectionMode = false;
     this.activePin = null;
+    this.hasHandledShare = false;
 
     this.init();
   }
@@ -202,30 +203,101 @@ class DamabangApp {
     // 5. Register PWA Service Worker
     this.registerServiceWorker();
 
-    // 6. Handle Web Share Target or Action URLs (?url=... or ?action=add)
+    // 6. Handle Web Share Target Immediate Auto-Save
     this.handleIncomingShareTarget();
+
+    // 7. Check Clipboard for Instagram links
+    this.checkClipboardForInstagramLink();
   }
 
   // Handle Incoming Share from Instagram / YouTube / Mobile Share Sheet
   async handleIncomingShareTarget() {
-    const params = new URLSearchParams(window.location.search);
+    const fullSearch = window.location.search || (window.location.hash.includes('?') ? window.location.hash.split('?')[1] : '');
+    const params = new URLSearchParams(fullSearch);
     const sharedUrl = params.get('url');
     const sharedText = params.get('text');
     const sharedTitle = params.get('title');
     const action = params.get('action');
 
     if (sharedUrl || sharedText || sharedTitle) {
+      this.hasHandledShare = true;
       const combinedInput = [sharedUrl, sharedText].filter(Boolean).join(' ');
+      console.log('🔥 Incoming Web Share Target detected:', { sharedUrl, sharedText, sharedTitle, combinedInput });
+
       const analysis = SmartContentAnalyzer.analyze(combinedInput, sharedTitle || '');
 
-      this.openAddModal(analysis);
-      this.showToast('✨ 공유된 콘텐츠를 스마트 분석하여 자동 채웠습니다!');
-      
-      // Clean up URL parameters without reloading
+      // Create new Pin object
+      const newPin = {
+        id: 'pin_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5),
+        url: analysis.url,
+        title: analysis.title,
+        platform: analysis.platform,
+        category: analysis.category,
+        tags: analysis.tags,
+        location: {
+          city: analysis.city,
+          name: analysis.spotName,
+          address: ''
+        },
+        memo: analysis.memo,
+        thumbnail: analysis.thumbnail,
+        insightPoints: analysis.insightPoints,
+        createdAt: new Date().toISOString()
+      };
+
+      // 1. Immediately Save to Local Storage
+      await window.storageManager.savePin(newPin);
+      this.pins = await window.storageManager.getAllPins();
+
+      // 2. Switch to feed & re-render
+      this.switchTab('feed');
+      this.render();
+
+      // 3. Show celebratory toast and open detail view
+      this.showToast(`🎉 '${analysis.title}' 담아방에 자동 보관 완료!`);
+      setTimeout(() => {
+        this.openDetailModal(newPin);
+      }, 350);
+
+      // 4. Clean up URL parameters without reload
       window.history.replaceState({}, document.title, window.location.pathname);
     } else if (action === 'add') {
       this.openAddModal();
       window.history.replaceState({}, document.title, window.location.pathname);
+    }
+  }
+
+  // Check Clipboard for copied Instagram / YouTube Links
+  async checkClipboardForInstagramLink() {
+    if (!navigator.clipboard || !navigator.clipboard.readText) return;
+
+    try {
+      // Gentle clipboard check on window focus
+      const checkClip = async () => {
+        try {
+          const text = await navigator.clipboard.readText();
+          if (text && (text.includes('instagram.com') || text.includes('youtube.com') || text.includes('youtu.be'))) {
+            // Check if already in pins
+            const alreadyExists = this.pins.some(p => p.url && text.includes(p.url));
+            if (!alreadyExists) {
+              const banner = document.getElementById('clipboard-banner');
+              const urlText = document.getElementById('clipboard-url-text');
+              if (banner && urlText) {
+                this.pendingClipboardText = text;
+                urlText.innerText = text;
+                banner.style.display = 'flex';
+              }
+            }
+          }
+        } catch (e) {
+          // Clipboard permission dismissed or unavailable
+        }
+      };
+
+      window.addEventListener('focus', checkClip);
+      setTimeout(checkClip, 800);
+    } catch (e) {
+      console.warn('Clipboard check disabled:', e);
     }
   }
 
@@ -242,6 +314,14 @@ class DamabangApp {
 
   // Bind UI Events
   bindEvents() {
+    // Multi-lifecycle Share Target Listeners (Android WebAPK background wakeup)
+    window.addEventListener('pageshow', () => this.handleIncomingShareTarget());
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible') {
+        this.handleIncomingShareTarget();
+      }
+    });
+
     // Tab Navigation
     document.querySelectorAll('.bottom-nav .nav-item').forEach(btn => {
       btn.addEventListener('click', () => {
@@ -334,6 +414,52 @@ class DamabangApp {
       searchClear.style.display = 'none';
       this.renderFeed();
     });
+
+    // Quick Paste Button in Header
+    const btnQuickPaste = document.getElementById('btn-quick-paste');
+    if (btnQuickPaste) {
+      btnQuickPaste.addEventListener('click', async () => {
+        let textToPaste = '';
+        if (navigator.clipboard && navigator.clipboard.readText) {
+          try {
+            textToPaste = await navigator.clipboard.readText();
+          } catch (e) {
+            // fallback to prompt
+          }
+        }
+        if (!textToPaste) {
+          textToPaste = prompt('인스타그램 또는 유튜브 링크를 붙여넣으세요:');
+        }
+
+        if (textToPaste && textToPaste.trim()) {
+          const analysis = SmartContentAnalyzer.analyze(textToPaste.trim());
+          this.openAddModal(analysis);
+          this.showToast('✨ 링크를 분석하여 자동으로 채웠습니다!');
+        }
+      });
+    }
+
+    // Clipboard Banner Actions
+    const btnClipboardAdd = document.getElementById('btn-clipboard-add');
+    const btnClipboardClose = document.getElementById('btn-clipboard-close');
+    const clipboardBanner = document.getElementById('clipboard-banner');
+
+    if (btnClipboardAdd) {
+      btnClipboardAdd.addEventListener('click', () => {
+        if (this.pendingClipboardText) {
+          const analysis = SmartContentAnalyzer.analyze(this.pendingClipboardText);
+          this.openAddModal(analysis);
+          if (clipboardBanner) clipboardBanner.style.display = 'none';
+          this.showToast('✨ 복사된 링크가 자동 입력되었습니다!');
+        }
+      });
+    }
+
+    if (btnClipboardClose && clipboardBanner) {
+      btnClipboardClose.addEventListener('click', () => {
+        clipboardBanner.style.display = 'none';
+      });
+    }
 
     // Selection Mode Toggle
     const toggleSelectBtn = document.getElementById('btn-toggle-select');
@@ -861,7 +987,6 @@ class DamabangApp {
     const analysis = SmartContentAnalyzer.analyze(inputText, currentTitle);
     this.currentAutoAnalysis = analysis;
 
-    // Auto-fill fields if empty or freshly analyzed
     if (!document.getElementById('add-title').value || document.getElementById('add-title').value.includes('인스타그램') || document.getElementById('add-title').value.includes('유튜브')) {
       document.getElementById('add-title').value = analysis.title;
     }
