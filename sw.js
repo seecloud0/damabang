@@ -1,5 +1,5 @@
-// Damabang (담아방) Service Worker - v8.0.0 (Clean Itinerary View without Checklist)
-const CACHE_NAME = 'damabang-v8.0.0';
+// Damabang (담아방) Service Worker - v9.0.0 (PNG Icons & Store Ready)
+const CACHE_NAME = 'damabang-v9.0.0';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
@@ -7,8 +7,13 @@ const ASSETS_TO_CACHE = [
   './storage.js?v=8',
   './mock-data.js?v=8',
   './app.js?v=8',
-  './manifest.json?v=8',
-  './icons/icon.svg?v=8'
+  './manifest.json?v=9',
+  './icons/icon.svg?v=9',
+  './icons/icon-192.png?v=9',
+  './icons/icon-512.png?v=9',
+  './icons/icon-512-maskable.png?v=9',
+  './icons/screenshot-narrow.png?v=9',
+  './icons/screenshot-wide.png?v=9'
 ];
 
 self.addEventListener('install', (event) => {
