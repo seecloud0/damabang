@@ -1,19 +1,19 @@
-// Damabang (담아방) Service Worker - v9.0.0 (PNG Icons & Store Ready)
-const CACHE_NAME = 'damabang-v9.0.0';
+// Damabang (담아방) Service Worker - v10.0.0 (Web Share Target & Smart Analyzer)
+const CACHE_NAME = 'damabang-v10.0.0';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
-  './style.css?v=8',
-  './storage.js?v=8',
-  './mock-data.js?v=8',
-  './app.js?v=8',
-  './manifest.json?v=9',
-  './icons/icon.svg?v=9',
-  './icons/icon-192.png?v=9',
-  './icons/icon-512.png?v=9',
-  './icons/icon-512-maskable.png?v=9',
-  './icons/screenshot-narrow.png?v=9',
-  './icons/screenshot-wide.png?v=9'
+  './style.css?v=10',
+  './storage.js?v=10',
+  './mock-data.js?v=10',
+  './app.js?v=10',
+  './manifest.json?v=10',
+  './icons/icon.svg?v=10',
+  './icons/icon-192.png?v=10',
+  './icons/icon-512.png?v=10',
+  './icons/icon-512-maskable.png?v=10',
+  './icons/screenshot-narrow.png?v=10',
+  './icons/screenshot-wide.png?v=10'
 ];
 
 self.addEventListener('install', (event) => {

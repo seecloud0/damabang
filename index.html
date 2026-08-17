@@ -6,16 +6,16 @@
   <title>담아방 - 인스타·유튜브 콘텐츠 아카이브 & AI 스마트 플래너</title>
 
   <!-- PWA & Mobile Meta Tags -->
-  <link rel="manifest" href="manifest.json?v=9" />
+  <link rel="manifest" href="manifest.json?v=10" />
   <meta name="theme-color" content="#7132f5" />
   <meta name="background-color" content="#ffffff" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="default" />
   <meta name="apple-mobile-web-app-title" content="담아방" />
-  <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png?v=9" />
-  <link rel="icon" type="image/png" sizes="512x512" href="icons/icon-512.png?v=9" />
-  <link rel="icon" type="image/svg+xml" href="icons/icon.svg?v=9" />
-  <link rel="apple-touch-icon" href="icons/icon-192.png?v=9" />
+  <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png?v=10" />
+  <link rel="icon" type="image/png" sizes="512x512" href="icons/icon-512.png?v=10" />
+  <link rel="icon" type="image/svg+xml" href="icons/icon.svg?v=10" />
+  <link rel="apple-touch-icon" href="icons/icon-192.png?v=10" />
 
   <!-- Remix Icon & Kraken Fonts (IBM Plex Sans & Pretendard) -->
   <link href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css" rel="stylesheet" />
@@ -23,7 +23,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Pretendard:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
-  <link rel="stylesheet" href="style.css?v=8" />
+  <link rel="stylesheet" href="style.css?v=10" />
 
   <style>
     /* Absolute Pure White Guarantee */
@@ -51,7 +51,7 @@
     if ('caches' in window) {
       caches.keys().then(function(names) {
         for (let name of names) {
-          if (name !== 'damabang-v8.0.0') {
+          if (name !== 'damabang-v10.0.0') {
             caches.delete(name);
           }
         }
@@ -69,7 +69,7 @@
       <div class="header-top">
         <div class="brand-wrapper">
           <div class="brand-icon" style="padding: 2px;">
-            <img src="icons/icon.svg?v=7" alt="담아방 단아한 보울 로고" style="width: 100%; height: 100%; object-fit: contain;" />
+            <img src="icons/icon.svg?v=10" alt="담아방 단아한 보울 로고" style="width: 100%; height: 100%; object-fit: contain;" />
           </div>
           <div>
             <h1 class="brand-title">담아방</h1>
@@ -146,7 +146,7 @@
         <div id="feed-empty" class="empty-state" style="display: none;">
           <div class="empty-icon"><i class="ri-sparkling-2-line"></i></div>
           <h3 class="empty-title">담아둔 콘텐츠가 없습니다</h3>
-          <p class="empty-desc">인스타그램 릴스나 유튜브 링크를 복사하여 아래 [+] 버튼으로 내 담아방에 보관해보세요!</p>
+          <p class="empty-desc">인스타그램이나 유튜브에서 [공유하기 ➡️ 담아방]을 누르거나 아래 [+] 버튼으로 콘텐츠를 보관해보세요!</p>
         </div>
       </section>
 
@@ -165,7 +165,7 @@
             <span>담아방 AI 스마트 플래너</span>
           </div>
           <p style="font-size: 13px; color: var(--color-cool-gray); margin-bottom: 14px;">
-            담아둔 핀들의 장소와 꿀팁을 분석하여 최적의 일정표와 체크리스트를 자동 조합합니다.
+            담아둔 핀들의 장소와 꿀팁을 분석하여 최적의 일정표와 동선을 자동 조합합니다.
           </p>
 
           <div class="planner-controls">
@@ -191,7 +191,7 @@
         </div>
 
         <div id="plan-output-container" class="plan-result-container">
-          <!-- Generated Day Plan Cards & Checklist will be rendered here -->
+          <!-- Generated Day Plan Cards will be rendered here -->
         </div>
       </section>
 
@@ -216,7 +216,7 @@
             <div class="store-icon">🔒</div>
             <div class="store-text">
               <h4>100% 온디바이스 프라이빗 담아방</h4>
-              <p>모든 데이터는 외부 서버 없이 내 휴대폰 로컬에만 보관됩니다.</p>
+              <p>모든 데이터는 외부 서버 없이 내 휴대폰 로컬에만 안전하게 보관됩니다.</p>
             </div>
           </div>
 
@@ -299,7 +299,7 @@
 
   </div>
 
-  <!-- Modal 1: Add New Pin Bottom Sheet -->
+  <!-- Modal 1: Add New Pin Bottom Sheet (스마트 자동 분석 미리보기) -->
   <div id="modal-add" class="modal-overlay">
     <div class="bottom-sheet">
       <div class="sheet-handle"></div>
@@ -310,25 +310,26 @@
 
       <form id="form-add-pin">
         <div class="form-group">
-          <label class="form-label">🔗 인스타 / 유튜브 링크</label>
-          <input type="url" id="add-url" class="form-input" placeholder="https://instagram.com/reel/... 또는 youtube.com/..." required />
+          <label class="form-label">🔗 인스타 / 유튜브 링크 또는 본문 붙여넣기</label>
+          <input type="text" id="add-url" class="form-input" placeholder="링크를 붙여넣으면 제목·카테고리·태그가 자동 입력됩니다" required />
+          
           <div id="url-preview-box" class="url-preview-box">
             <img id="preview-thumb-img" src="" class="preview-thumb" alt="Preview" />
             <div style="flex: 1; font-size: 13px; color: var(--color-near-black);">
-              <span id="preview-platform-text" style="font-weight: 700; color: var(--kraken-purple);">플랫폼 인식됨</span>
-              <div id="preview-auto-title" style="color: var(--color-cool-gray); font-size: 12px;">썸네일 및 정보 추출 완료</div>
+              <span id="preview-platform-text" style="font-weight: 700; color: var(--kraken-purple);">스마트 분석 완료</span>
+              <div id="preview-auto-title" style="color: var(--color-cool-gray); font-size: 12px;">카테고리 및 여행지 자동 매칭됨</div>
             </div>
           </div>
         </div>
 
         <div class="form-group">
-          <label class="form-label">📌 제목 또는 콘텐츠 요약</label>
+          <label class="form-label">📌 제목 (자동 생성됨 / 수정 가능)</label>
           <input type="text" id="add-title" class="form-input" placeholder="예: 시부야 스카이 일몰 예약 꿀팁" required />
         </div>
 
         <div class="control-row">
           <div class="form-group" style="flex: 1;">
-            <label class="form-label">🏷️ 카테고리</label>
+            <label class="form-label">🏷️ 카테고리 (자동 판별)</label>
             <select id="add-category" class="form-select">
               <option value="travel">✈️ 여행/명소</option>
               <option value="food">🍱 맛집/카페</option>
@@ -337,7 +338,7 @@
             </select>
           </div>
           <div class="form-group" style="flex: 1;">
-            <label class="form-label">📍 여행지 / 도시</label>
+            <label class="form-label">📍 여행지 / 도시 (자동 추출)</label>
             <input type="text" id="add-city" class="form-input" placeholder="예: 도쿄, 제주도, 성수동" />
           </div>
         </div>
@@ -348,13 +349,13 @@
         </div>
 
         <div class="form-group">
-          <label class="form-label">#️⃣ 태그 (쉼표로 구분)</label>
+          <label class="form-label">#️⃣ 태그 (자동 추출됨)</label>
           <input type="text" id="add-tags" class="form-input" placeholder="도쿄여행, 야경스팟, 3박4일" />
         </div>
 
         <div class="form-group">
           <label class="form-label">📝 핵심 메모 & 꿀팁 / 인사이트</label>
-          <textarea id="add-memo" class="form-textarea" placeholder="영상에서 언급된 예약 시간, 꼭 챙길 것, 인사이트 요약을 적어두세요."></textarea>
+          <textarea id="add-memo" class="form-textarea" placeholder="영상에서 언급된 예약 시간, 꼭 챙길 것, 인사이트 요약"></textarea>
         </div>
 
         <button type="submit" class="btn-primary-action" style="margin-top: 10px;">
@@ -456,8 +457,8 @@
   </div>
 
   <!-- Application Logic -->
-  <script src="storage.js?v=8"></script>
-  <script src="mock-data.js?v=8"></script>
-  <script src="app.js?v=8"></script>
+  <script src="storage.js?v=10"></script>
+  <script src="mock-data.js?v=10"></script>
+  <script src="app.js?v=10"></script>
 </body>
 </html>

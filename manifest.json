@@ -12,6 +12,15 @@
   "lang": "ko",
   "dir": "ltr",
   "categories": ["travel", "productivity", "lifestyle", "utilities"],
+  "share_target": {
+    "action": "./index.html",
+    "method": "GET",
+    "params": {
+      "title": "title",
+      "text": "text",
+      "url": "url"
+    }
+  },
   "icons": [
     {
       "src": "icons/icon-192.png",
